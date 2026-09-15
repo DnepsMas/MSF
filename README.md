@@ -1,5 +1,7 @@
 # MSF — My Skill Folder
 
+[简体中文](README.zh-CN.md) | English
+
 MSF is a lightweight, explicit Codex workflow for persistent project planning and disciplined execution across separate sessions. It keeps useful specification-driven rigor without forcing every coding request through a large skill chain.
 
 ## Skills

@@ -1,0 +1,6 @@
+interface:
+  display_name: "MSF Plan"
+  short_description: "Plan changes without implementing them"
+  default_prompt: "使用 $msf-plan 设计并保存可执行计划；默认用中文回复，若我未指定强度，先让我选择 Light、Medium、High 或 Ultra。"
+policy:
+  allow_implicit_invocation: false

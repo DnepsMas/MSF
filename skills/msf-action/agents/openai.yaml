@@ -1,0 +1,6 @@
+interface:
+  display_name: "MSF Action"
+  short_description: "Execute and document an approved MSF plan"
+  default_prompt: "使用 $msf-action 执行我指定的已批准 MSF 计划，并默认用中文回复。"
+policy:
+  allow_implicit_invocation: false

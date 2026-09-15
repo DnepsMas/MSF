@@ -1,0 +1,8 @@
+{
+  "name": "msf-sample-project",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "build": "node -e \"console.log('build ok')\""
+  }
+}

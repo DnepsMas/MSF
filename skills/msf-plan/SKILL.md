@@ -37,14 +37,19 @@ Read [references/planning-levels.md](references/planning-levels.md) and apply th
 
 1. **Frame** — restate the problem, desired outcome, constraints, non-goals, and observable success.
 2. **Investigate** — trace the affected flow and find analogous working patterns. Label confirmed evidence, user decisions, and assumptions separately.
-3. **Clarify** — ask only consequential questions, one at a time. Prefer native choice UI when available. Do not ask the user to decide implementation details that repository evidence can settle.
-4. **Design** — present viable approaches when a meaningful tradeoff exists, leading with a recommendation. Keep YAGNI pressure: every component must serve an accepted requirement.
-5. **Decompose** — map requirements to coherent implementation tasks, dependencies, affected files or symbols, and task-level verification. Avoid both vague phases and mechanical micro-steps.
-6. **Check readiness** — use [references/readiness-check.md](references/readiness-check.md). Fix contradictions and missing coverage before approval.
-7. **Approve** — present the proposed design and execution outline in chat. Obtain explicit user approval. Silence is not approval.
-8. **Persist** — only after approval, create the dated pair defined in [references/plan-format.md](references/plan-format.md). Never overwrite an existing plan.
-9. **Remember** — write a compact summary using [references/session-format.md](references/session-format.md) and update project memory only with durable facts or decisions.
+3. **Open the working report** — after the first useful investigation, immediately create the dated human plan defined in [references/plan-format.md](references/plan-format.md) with status `draft`. Record the current goal, evidence, decisions, assumptions, open questions, and next step. Do not wait for the user to ask for a file.
+4. **Clarify** — ask only consequential questions, one at a time. Prefer native choice UI when available. Do not ask the user to decide implementation details that repository evidence can settle.
+5. **Design** — present viable approaches when a meaningful tradeoff exists, leading with a recommendation. Keep YAGNI pressure: every component must serve an accepted requirement.
+6. **Decompose** — map requirements to coherent implementation tasks, dependencies, affected files or symbols, and task-level verification. Avoid both vague phases and mechanical micro-steps.
+7. **Check readiness** — use [references/readiness-check.md](references/readiness-check.md). Fix contradictions and missing coverage before approval.
+8. **Approve** — present the proposed design and execution outline in chat. Obtain explicit user approval. Silence is not approval.
+9. **Finalize** — update the same human report to status `approved`, add the approval record, and create its paired `.ai.md` execution plan. Never overwrite an unrelated plan.
+10. **Remember** — write or finalize the compact session summary using [references/session-format.md](references/session-format.md) and update project memory only with durable facts or decisions.
 
-Keep drafts in the active session. If approval is not reached, do not create plan files; still preserve a session summary when meaningful findings or decisions must survive.
+## Persist continuously
+
+The working report is part of the planning process, not an optional final deliverable. Update it promptly after each material repository finding, answered requirement question, accepted or rejected approach, scope change, design decision, or readiness result. Persist the decision before moving to a new topic or asking the next consequential question. Do not rewrite it for conversational filler or duplicate the transcript.
+
+If the session ends without approval, retain the human report with status `draft`, record unresolved items and the exact next step, and write a session summary. Do not create the `.ai.md` execution plan until approval.
 
 Finish by reporting both exact plan paths and instructing the user to start a new session, explicitly invoke `$msf-action`, and name the `.ai.md` plan. Never transition to implementation in this session.

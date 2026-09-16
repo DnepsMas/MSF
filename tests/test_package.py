@@ -26,6 +26,15 @@ class PackageContractTests(unittest.TestCase):
         self.assertIn("Never transition to implementation in this session", plan)
         self.assertIn("explicit user approval", plan)
 
+    def test_plan_persists_a_live_report_before_approval(self) -> None:
+        plan = self.read("skills/msf-plan/SKILL.md")
+        plan_format = self.read("skills/msf-plan/references/plan-format.md")
+        self.assertIn("immediately create the dated human plan", plan)
+        self.assertIn("Do not wait for the user to ask for a file", plan)
+        self.assertIn("Persist the decision before moving to a new topic", plan)
+        self.assertIn("status `draft`", plan_format)
+        self.assertIn("Do not create this file for a draft", plan_format)
+
     def test_action_requires_named_plan_and_evidence(self) -> None:
         action = self.read("skills/msf-action/SKILL.md")
         self.assertIn("Never select the newest plan", action)

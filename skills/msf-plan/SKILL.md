@@ -37,8 +37,8 @@ Read [references/planning-levels.md](references/planning-levels.md) and apply th
 
 1. **Frame** — restate the problem, desired outcome, constraints, non-goals, and observable success.
 2. **Investigate** — trace the affected flow and find analogous working patterns. Label confirmed evidence, user decisions, and assumptions separately.
-3. **Open the working report** — after the first useful investigation, immediately create the dated human plan defined in [references/plan-format.md](references/plan-format.md) with status `draft`. Record the current goal, evidence, decisions, assumptions, open questions, and next step. Do not wait for the user to ask for a file.
-4. **Clarify** — ask only consequential questions, one at a time. Prefer native choice UI when available. Do not ask the user to decide implementation details that repository evidence can settle.
+3. **Clarify** — ask only consequential questions, one at a time. Prefer native choice UI when available. Do not ask the user to decide implementation details that repository evidence can settle.
+4. **Open the working report** — once the current turn can proceed without another user requirement answer, create the dated human plan defined in [references/plan-format.md](references/plan-format.md) with status `draft`. Batch the accumulated goal, evidence, decisions, assumptions, and next step. Do not wait for the user to request a file.
 5. **Design** — present viable approaches when a meaningful tradeoff exists, leading with a recommendation. Keep YAGNI pressure: every component must serve an accepted requirement.
 6. **Decompose** — map requirements to coherent implementation tasks, dependencies, affected files or symbols, and task-level verification. Avoid both vague phases and mechanical micro-steps.
 7. **Check readiness** — use [references/readiness-check.md](references/readiness-check.md). Fix contradictions and missing coverage before approval.
@@ -46,9 +46,11 @@ Read [references/planning-levels.md](references/planning-levels.md) and apply th
 9. **Finalize** — update the same human report to status `approved`, add the approval record, and create its paired `.ai.md` execution plan. Never overwrite an unrelated plan.
 10. **Remember** — write or finalize the compact session summary using [references/session-format.md](references/session-format.md) and update project memory only with durable facts or decisions.
 
-## Persist continuously
+## Persist at planning checkpoints
 
-The working report is part of the planning process, not an optional final deliverable. Update it promptly after each material repository finding, answered requirement question, accepted or rejected approach, scope change, design decision, or readiness result. Persist the decision before moving to a new topic or asking the next consequential question. Do not rewrite it for conversational filler or duplicate the transcript.
+The working report is part of planning, but file writes must not interrupt requirement discovery. If the next response needs a user answer, ask the question promptly and keep accumulated discussion in the active context; do not write merely because one question was answered.
+
+Write in batches when the current turn no longer needs another user requirement answer. Useful checkpoints are: clarification is sufficient for autonomous design, a coherent design section is settled, readiness review is complete, approval changes plan status, or the user pauses or ends planning. Normally make one consolidated report update per such turn, not one write per finding or decision. Do not duplicate the transcript.
 
 If the session ends without approval, retain the human report with status `draft`, record unresolved items and the exact next step, and write a session summary. Do not create the `.ai.md` execution plan until approval.
 

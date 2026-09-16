@@ -1,12 +1,12 @@
 # Working report and approved plan pair
 
-After the first useful investigation, create the human report automatically:
+Once requirement clarification is sufficient to continue without another user answer in the current turn, create the human report automatically:
 
 ```text
 .msf/plan/YYYY-MM-DD-<short-topic>.md
 ```
 
-It begins with status `draft` and is updated throughout discussion. After explicit approval, change the same report to `approved` and create:
+It begins with status `draft`. Batch updates at meaningful planning checkpoints instead of writing after every answer, finding, or decision. After explicit approval, change the same report to `approved` and create:
 
 ```text
 .msf/plan/YYYY-MM-DD-<short-topic>.ai.md

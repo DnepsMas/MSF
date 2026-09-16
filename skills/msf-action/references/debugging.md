@@ -9,4 +9,4 @@ Use for bugs, failing tests, regressions, performance anomalies, and unexpected 
 5. **Protect behavior** — when practical, add a regression test that fails for the expected reason before the production fix.
 6. **Fix the source** — make the smallest change that addresses the confirmed cause, then run focused and regression checks.
 
-If a hypothesis fails, return to evidence with the new observation. After three failed fix hypotheses, stop and reassess the architecture or assumptions with the user; do not add a fourth speculative patch. If the cause is external or timing-dependent, document the investigation and add proportionate handling or observability rather than pretending certainty.
+If a hypothesis fails, return to evidence with the new observation. After three failed fix hypotheses, stop speculative patching and reassess the architecture and assumptions from available evidence. Ask the user only when progress requires unavailable information, new authority, or a material product decision. If the cause is external or timing-dependent, document the investigation and add proportionate handling or observability rather than pretending certainty.

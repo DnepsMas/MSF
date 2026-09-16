@@ -52,7 +52,7 @@ Use [references/verification.md](references/verification.md). Completion require
 Whether completed, partial, or blocked:
 
 1. finalize the development log if any mutation or execution attempt occurred;
-2. write a compact summary using [references/session-format.md](references/session-format.md);
+2. write a compact recovery-pointer summary using [references/session-format.md](references/session-format.md);
 3. update project memory only with durable facts, commands, constraints, or decisions;
 4. report status, changed files, verification evidence, deviations, risks, and exact MSF record paths.
 

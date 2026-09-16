@@ -23,7 +23,7 @@ If absent, the first response MUST ask for the strength, briefly describe all fo
 - Write only under `.msf/plan/` and `.msf/memory/`.
 - Do not modify code, tests, configuration, dependencies, external documentation, or Git state.
 - Do not scaffold, prototype, or begin implementation.
-- Invoke `msf-init` if the MSF baseline is missing, then remain in Plan mode.
+- If the MSF baseline is missing, stop before planning writes and instruct the user to explicitly invoke `$msf-init`; resume Plan afterward.
 
 ## Load context deliberately
 
@@ -38,7 +38,7 @@ Read [references/planning-levels.md](references/planning-levels.md) and apply th
 1. **Frame** — restate the problem, desired outcome, constraints, non-goals, and observable success.
 2. **Investigate** — trace the affected flow and find analogous working patterns. Label confirmed evidence, user decisions, and assumptions separately.
 3. **Clarify** — ask only consequential questions, one at a time. Prefer native choice UI when available. Do not ask the user to decide implementation details that repository evidence can settle.
-4. **Open the working report** — once the current turn can proceed without another user requirement answer, create the dated human plan defined in [references/plan-format.md](references/plan-format.md) with status `draft`. Batch the accumulated goal, evidence, decisions, assumptions, and next step. Do not wait for the user to request a file.
+4. **Open the working report** — when requirement clarification is sufficient, create or update the dated human plan according to **Persist at planning checkpoints** below. Do not wait for the user to request a file.
 5. **Design** — present viable approaches when a meaningful tradeoff exists, leading with a recommendation. Keep YAGNI pressure: every component must serve an accepted requirement.
 6. **Decompose** — map requirements to coherent implementation tasks, dependencies, affected files or symbols, and task-level verification. Avoid both vague phases and mechanical micro-steps.
 7. **Check readiness** — use [references/readiness-check.md](references/readiness-check.md). Fix contradictions and missing coverage before approval.
@@ -54,4 +54,4 @@ Write in batches when the current turn no longer needs another user requirement 
 
 If the session ends without approval, retain the human report with status `draft`, record unresolved items and the exact next step, and write a session summary. Do not create the `.ai.md` execution plan until approval.
 
-Finish by reporting both exact plan paths and instructing the user to start a new session, explicitly invoke `$msf-action`, and name the `.ai.md` plan. Never transition to implementation in this session.
+When approved, finish by reporting both exact plan paths and instructing the user to start a new session, explicitly invoke `$msf-action`, and name the `.ai.md` plan. When still draft or blocked, report the human-plan path, unresolved items, and exact next planning step. Never transition to implementation in this session.

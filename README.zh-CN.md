@@ -58,6 +58,14 @@ git pull
 python scripts/install.py --force
 ```
 
+如果以前曾将 MSF 安装到 `~/.codex/skills`，请执行迁移，避免 `/skills` 或技能选择菜单出现重复项：
+
+```powershell
+python scripts/install.py --force --remove-legacy
+```
+
+安装器检测到旧位置仍有同名技能时会停止并给出提示，不会静默安装第二份。`--remove-legacy` 只会在新版本安装成功后移除旧位置中的三个 `msf-*` 目录。
+
 macOS 或 Linux 可将 `python` 换成 `python3`。
 
 ## 验证安装

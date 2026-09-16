@@ -18,6 +18,10 @@ def default_destination() -> Path:
     return Path.home() / ".agents" / "skills"
 
 
+def legacy_destination() -> Path:
+    return Path.home() / ".codex" / "skills"
+
+
 def validate_source() -> None:
     missing = [name for name in SKILLS if not (SOURCE_ROOT / name / "SKILL.md").is_file()]
     if missing:
@@ -43,9 +47,34 @@ def sync_tree(source: Path, target: Path) -> None:
         shutil.copy2(source / relative, output)
 
 
-def install(destination: Path, force: bool = False, dry_run: bool = False) -> list[Path]:
+def find_legacy_installs(destination: Path, legacy_root: Path | None = None) -> list[Path]:
+    destination = destination.expanduser().resolve()
+    if legacy_root is None:
+        if destination != default_destination().resolve():
+            return []
+        legacy_root = legacy_destination()
+    legacy_root = legacy_root.expanduser().resolve()
+    if legacy_root == destination:
+        return []
+    return [legacy_root / name for name in SKILLS if (legacy_root / name).exists()]
+
+
+def install(
+    destination: Path,
+    force: bool = False,
+    dry_run: bool = False,
+    remove_legacy: bool = False,
+    legacy_root: Path | None = None,
+) -> list[Path]:
     validate_source()
     destination = destination.expanduser().resolve()
+    legacy_installs = find_legacy_installs(destination, legacy_root)
+    if legacy_installs and not remove_legacy:
+        locations = ", ".join(str(path) for path in legacy_installs)
+        raise FileExistsError(
+            "Duplicate legacy MSF installation found: "
+            f"{locations}. Re-run with --remove-legacy to keep only the default installation."
+        )
     existing = [destination / name for name in SKILLS if (destination / name).exists()]
     if existing and not force:
         names = ", ".join(path.name for path in existing)
@@ -59,12 +88,19 @@ def install(destination: Path, force: bool = False, dry_run: bool = False) -> li
     backup_root = Path(tempfile.mkdtemp(prefix=".msf-backup-", dir=destination))
     installed: list[Path] = []
     backed_up: list[tuple[Path, Path]] = []
+    legacy_backups: list[tuple[Path, Path]] = []
     try:
         for target in targets:
             if target.exists():
-                backup = backup_root / target.name
+                backup = backup_root / "current" / target.name
+                backup.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copytree(target, backup)
                 backed_up.append((target, backup))
+        for legacy in legacy_installs:
+            backup = backup_root / "legacy" / legacy.name
+            backup.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(legacy, backup)
+            legacy_backups.append((legacy, backup))
         for name in SKILLS:
             target = destination / name
             if force and target.exists():
@@ -72,6 +108,8 @@ def install(destination: Path, force: bool = False, dry_run: bool = False) -> li
             else:
                 shutil.copytree(SOURCE_ROOT / name, target)
             installed.append(target)
+        for legacy in legacy_installs:
+            shutil.rmtree(legacy)
     except Exception:
         for target in reversed(installed):
             backup = next((saved for old, saved in backed_up if old == target), None)
@@ -79,6 +117,9 @@ def install(destination: Path, force: bool = False, dry_run: bool = False) -> li
                 sync_tree(backup, target)
             elif target.exists():
                 shutil.rmtree(target)
+        for legacy, backup in legacy_backups:
+            if backup.exists():
+                sync_tree(backup, legacy)
         raise
     finally:
         shutil.rmtree(backup_root, ignore_errors=True)
@@ -89,6 +130,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--destination", type=Path, default=default_destination())
     parser.add_argument("--force", action="store_true", help="replace existing MSF skill directories")
+    parser.add_argument(
+        "--remove-legacy",
+        action="store_true",
+        help="remove duplicate MSF skills from ~/.codex/skills after installing to the default location",
+    )
     parser.add_argument("--dry-run", action="store_true", help="show destinations without writing")
     return parser.parse_args(argv)
 
@@ -96,13 +142,23 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
-        targets = install(args.destination, force=args.force, dry_run=args.dry_run)
+        legacy_installs = find_legacy_installs(args.destination)
+        targets = install(
+            args.destination,
+            force=args.force,
+            dry_run=args.dry_run,
+            remove_legacy=args.remove_legacy,
+        )
     except (OSError, RuntimeError) as exc:
         print(f"MSF installation failed: {exc}", file=sys.stderr)
         return 1
     action = "Would install" if args.dry_run else "Installed"
     for target in targets:
         print(f"{action}: {target}")
+    if args.remove_legacy:
+        legacy_action = "Would remove legacy" if args.dry_run else "Removed legacy"
+        for target in legacy_installs:
+            print(f"{legacy_action}: {target}")
     return 0
 
 

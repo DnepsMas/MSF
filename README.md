@@ -28,6 +28,14 @@ To replace an older MSF installation:
 python scripts/install.py --force
 ```
 
+If MSF was previously installed under `~/.codex/skills`, migrate it instead of keeping both copies:
+
+```powershell
+python scripts/install.py --force --remove-legacy
+```
+
+The installer refuses to create duplicate menu entries when it detects the legacy copy. `--remove-legacy` removes only the three `msf-*` directories from the old location after installing the new copy.
+
 The default destination is `~/.agents/skills`, Codex's user-level skills directory. Use `--destination <path>` for testing or a nonstandard location. Codex normally detects newly installed skills automatically; restart Codex if they do not appear.
 
 Verify the installation in Codex with `/skills`, then explicitly invoke `$msf-init` inside the project where you want to use MSF.

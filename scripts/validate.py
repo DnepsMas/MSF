@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = Path.home() / ".codex" / "skills" / ".system" / "skill-creator" / "scripts" / "quick_validate.py"
-SKILLS = ("msf-init", "msf-plan", "msf-action")
+SKILLS = ("msf-init", "msf-plan", "msf-action", "msf-auto")
 
 
 def require(condition: bool, message: str) -> None:
@@ -46,6 +46,7 @@ def main() -> int:
     init_sections = sections(contents["msf-init"])
     plan_sections = sections(contents["msf-plan"])
     action_sections = sections(contents["msf-action"])
+    auto_sections = sections(contents["msf-auto"])
     require({"scope", "establish project context", "version-control invariant", "verify and report"} <= init_sections, "msf-init: incomplete lifecycle")
     require("<HARD-GATE>" in contents["msf-plan"], "msf-plan: strength gate missing")
     require({"non-implementation boundary", "load context deliberately", "scale the work", "planning loop", "persist at planning checkpoints"} <= plan_sections, "msf-plan: incomplete lifecycle")
@@ -54,8 +55,17 @@ def main() -> int:
     require("status `draft`" in contents["msf-plan"], "msf-plan: draft lifecycle missing")
     require("Never transition to implementation in this session" in contents["msf-plan"], "msf-plan: session boundary missing")
     require("<HARD-GATE>" in contents["msf-action"], "msf-action: entry gate missing")
-    require({"load narrowly", "preflight before edits", "execute task by task", "completion gate", "close every meaningful session"} <= action_sections, "msf-action: incomplete lifecycle")
+    require({"load narrowly", "preflight before edits", "execute task by task", "checkpoint automatically", "completion gate", "close every meaningful session"} <= action_sections, "msf-action: incomplete lifecycle")
     require("Never select the newest plan" in contents["msf-action"], "msf-action: explicit plan selection missing")
+    require("before the first production mutation" in contents["msf-action"], "msf-action: pre-mutation checkpoint missing")
+    require("The `.msf` records, not chat history" in contents["msf-action"], "msf-action: context handoff contract missing")
+    require("<HARD-GATE>" in contents["msf-auto"], "msf-auto: entry gate missing")
+    require({"context boundary", "plan", "open the coordination checkpoint", "resolve the action model", "dispatch the action worker", "supervise without micromanaging", "verify and close", "resume"} <= auto_sections, "msf-auto: incomplete lifecycle")
+    require("fork_turns=none" in contents["msf-auto"], "msf-auto: fresh worker boundary missing")
+    require("authoritative model inventory" in contents["msf-auto"], "msf-auto: runtime model resolution missing")
+    require("Never silently correct" in contents["msf-auto"], "msf-auto: model typo confirmation missing")
+    require("must not start a second writer" in contents["msf-auto"], "msf-auto: single-writer rule missing")
+    require("must not expand it" in contents["msf-auto"], "msf-auto: correction boundary missing")
     print("MSF package validation passed.")
     return 0
 

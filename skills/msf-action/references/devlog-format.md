@@ -13,6 +13,7 @@ On collision append `-02`, `-03`, and so on. Update the same log throughout one 
 
 ## Run
 - Plan path / plan ID
+- Action checkpoint path / attempt ID
 - Started / last updated
 - Status: in_progress | completed | partial | blocked
 - Repository baseline when available

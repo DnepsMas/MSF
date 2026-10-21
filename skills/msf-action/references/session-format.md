@@ -1,4 +1,6 @@
-# Action session summary
+# Action session summary (legacy compatibility)
+
+New Action sessions use [handoff-checkpoint.md](handoff-checkpoint.md). Existing session summaries remain valid recovery pointers and must not be rewritten only to adopt the new format.
 
 Name `YYYYMMDD-HHMM-<topic>.md`, adding a numeric suffix on collision.
 

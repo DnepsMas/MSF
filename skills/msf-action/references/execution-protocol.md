@@ -36,4 +36,4 @@ Do not require commits, worktrees, TDD, subagents, or code-review agents univers
 
 ## Resume
 
-When resuming an incomplete Action session, read the named plan plus the latest development log for that plan. Independently verify repository state before trusting recorded task status. Continue from the first incomplete dependency-ready task; do not repeat completed work without cause.
+When resuming an incomplete Action session, require the named plan and follow [handoff-checkpoint.md](handoff-checkpoint.md). Select checkpoints only after filtering by the exact plan path and plan ID. Read the checkpoint plus its development log, independently verify repository state, and reconcile any newer or unexplained changes before trusting task status. Continue from the first incomplete dependency-ready task; do not repeat completed work without cause.

@@ -2,7 +2,7 @@
 
 ## Project overview
 
-MSF (My Skill Folder) is a lightweight, explicit Codex workflow for persistent project planning and execution across separate sessions. It packages three explicitly invoked skills: `msf-init`, `msf-plan`, and `msf-action`.
+MSF (My Skill Folder) is a lightweight, explicit Codex workflow for persistent project planning and execution. It packages four explicitly invoked skills: `msf-init`, `msf-plan`, `msf-action`, and `msf-auto`.
 
 ## Technology and structure
 
@@ -27,3 +27,5 @@ MSF (My Skill Folder) is a lightweight, explicit Codex workflow for persistent p
 ## Decisions
 
 - Keep persistent plans, development logs, project memory, and session handoffs under `.msf/`.
+- Action sessions create a per-attempt context checkpoint before production edits, refresh it at meaningful execution boundaries, and recover only after matching the user-named plan and reconciling the real worktree.
+- Auto sessions preserve the Plan/Action context boundary while one coordinator plans, spawns a fresh Luna Action worker, supervises corrections, and independently verifies completion.

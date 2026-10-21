@@ -1,6 +1,6 @@
 # Session handoff / context checkpoint
 
-The checkpoint lets a fresh `$msf-action` session resume an explicitly named plan without chat history. It is a compact pointer; the development log and repository remain the detailed evidence.
+The checkpoint lets a fresh `/msf-action` session resume an explicitly named plan without chat history. It is a compact pointer; the development log and repository remain the detailed evidence.
 
 ## Location and identity
 

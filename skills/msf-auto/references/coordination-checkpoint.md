@@ -28,15 +28,15 @@ Append `-02`, `-03`, and so on on collision. Update the same file throughout the
 
 ## Worker
 - State: not_started | running | waiting | stopped | completion_candidate | completed | failed | unknown
-- Model inventory source: <native tool metadata, runtime catalog, unavailable, or other authoritative source>
+- Model inventory source: <Agent tool schema accepted values, or other authoritative source>
 - Model inventory observed: <timestamp with timezone>
-- Available model identifiers: <exact current identifiers, unavailable, or unknown>
-- Model originally requested: <user spelling, default gpt-6-luna, or none>
-- Model resolved: <exact confirmed identifier, pending, or none>
-- Model resolution: exact | confirmed_correction | waiting_user | inventory_unavailable | rejected_after_spawn
+- Available model identifiers: <exact accepted values, or unknown>
+- Model originally requested: <user spelling, or none (host default)>
+- Model resolved: <exact confirmed value, default, pending, or none>
+- Model resolution: exact | default | confirmed_correction | waiting_user | rejected_after_spawn
 - Suggested identifiers: <up to three closest exact identifiers, or none>
-- Reasoning effort: <resolved supported value, pending, or default>
-- Worker identity: <native subagent ID, or none>
+- Reasoning effort: <explicit supported value, or default>
+- Worker identity: <Agent tool agent ID, or none>
 - Spawn result: <confirmed, exact error, or not_started>
 - Action checkpoint: <exact path, pending, or none>
 - Development log: <exact path, pending, or none>
@@ -50,4 +50,4 @@ Append `-02`, `-03`, and so on on collision. Update the same file throughout the
 
 Keep this file compact. The approved plan is the contract, the Action development log is the execution record, and the Action checkpoint is the worker recovery pointer. Do not paste transcripts, hidden reasoning, full diffs, secrets, credentials, or large command output.
 
-Update it before dispatch, after each meaningful worker event or correction, before waiting or replacing a worker, and during closure. If the coordinator disappears, the next Auto session must treat the recorded worker identity as stale until Codex confirms that subagent is still live.
+Update it before dispatch, after each meaningful worker event or correction, before waiting or replacing a worker, and during closure. If the coordinator disappears, the next Auto session must treat the recorded worker identity as stale until Claude Code confirms that agent is still live.

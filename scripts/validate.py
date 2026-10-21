@@ -9,7 +9,6 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VALIDATOR = Path.home() / ".codex" / "skills" / ".system" / "skill-creator" / "scripts" / "quick_validate.py"
 SKILLS = ("msf-init", "msf-plan", "msf-action", "msf-auto")
 
 
@@ -37,11 +36,10 @@ def main() -> int:
         text = skill_file.read_text(encoding="utf-8")
         contents[name] = text
         validate_links(folder, text)
-        yaml = (folder / "agents" / "openai.yaml").read_text(encoding="utf-8")
-        require("allow_implicit_invocation: false" in yaml, f"{name}: must be explicit-only")
+        frontmatter = text.split("---")[1]
+        require("disable-model-invocation: true" in frontmatter, f"{name}: must be explicit-only")
+        require(not (folder / "agents").exists(), f"{name}: Codex agents metadata must not ship")
         require("Reply to the user in Chinese by default" in text, f"{name}: default Chinese rule missing")
-        if VALIDATOR.is_file():
-            subprocess.run([sys.executable, str(VALIDATOR), str(folder)], check=True)
 
     init_sections = sections(contents["msf-init"])
     plan_sections = sections(contents["msf-plan"])
@@ -61,8 +59,8 @@ def main() -> int:
     require("The `.msf` records, not chat history" in contents["msf-action"], "msf-action: context handoff contract missing")
     require("<HARD-GATE>" in contents["msf-auto"], "msf-auto: entry gate missing")
     require({"context boundary", "plan", "open the coordination checkpoint", "resolve the action model", "dispatch the action worker", "supervise without micromanaging", "verify and close", "resume"} <= auto_sections, "msf-auto: incomplete lifecycle")
-    require("fork_turns=none" in contents["msf-auto"], "msf-auto: fresh worker boundary missing")
-    require("authoritative model inventory" in contents["msf-auto"], "msf-auto: runtime model resolution missing")
+    require("never use `subagent_type = \"fork\"`" in contents["msf-auto"], "msf-auto: fresh worker boundary missing")
+    require("exposes no model inventory" in contents["msf-auto"], "msf-auto: runtime model resolution missing")
     require("Never silently correct" in contents["msf-auto"], "msf-auto: model typo confirmation missing")
     require("must not start a second writer" in contents["msf-auto"], "msf-auto: single-writer rule missing")
     require("must not expand it" in contents["msf-auto"], "msf-auto: correction boundary missing")

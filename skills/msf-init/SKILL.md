@@ -1,6 +1,7 @@
 ---
 name: msf-init
 description: Initialize or repair the lightweight repository-local MSF workspace used by explicit MSF Plan and Action sessions. Use only when the user explicitly invokes MSF initialization.
+disable-model-invocation: true
 ---
 
 # MSF Init

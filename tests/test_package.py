@@ -15,7 +15,8 @@ class PackageContractTests(unittest.TestCase):
     def test_all_skills_are_explicit_only_and_default_to_chinese(self) -> None:
         for name in ("msf-init", "msf-plan", "msf-action", "msf-auto"):
             with self.subTest(skill=name):
-                self.assertIn("allow_implicit_invocation: false", self.read(f"skills/{name}/agents/openai.yaml"))
+                self.assertIn("disable-model-invocation: true", self.read(f"skills/{name}/SKILL.md").split("---")[1])
+                self.assertFalse((ROOT / "skills" / name / "agents").exists())
                 self.assertIn("Reply to the user in Chinese by default", self.read(f"skills/{name}/SKILL.md"))
 
     def test_plan_keeps_strength_and_session_gates(self) -> None:
@@ -39,7 +40,7 @@ class PackageContractTests(unittest.TestCase):
 
     def test_plan_handles_missing_baseline_and_draft_completion_explicitly(self) -> None:
         plan = self.read("skills/msf-plan/SKILL.md")
-        self.assertIn("explicitly invoke `$msf-init`", plan)
+        self.assertIn("explicitly invoke `/msf-init`", plan)
         self.assertIn("When still draft or blocked", plan)
 
     def test_action_requires_named_plan_and_evidence(self) -> None:
@@ -76,15 +77,14 @@ class PackageContractTests(unittest.TestCase):
         checkpoint = self.read("skills/msf-auto/references/coordination-checkpoint.md")
         for level in ("Light", "Medium", "High", "Ultra"):
             self.assertIn(level, auto)
-        self.assertIn("prefer `gpt-6-luna` only when", auto)
-        self.assertIn("spawn_agent(", auto)
-        self.assertIn("fork_turns=none", auto)
-        self.assertIn("separate Action session required by `$msf-action`", auto)
+        self.assertIn("Agent(", auto)
+        self.assertIn("never use `subagent_type = \"fork\"`", auto)
+        self.assertIn("separate Action session required by `/msf-action`", auto)
         self.assertIn("must not start a second writer", auto)
         self.assertIn("must not expand it", auto)
         self.assertIn("completion candidate", auto)
         self.assertIn("Do not ask the user to copy a command", auto)
-        self.assertIn("$msf-auto resume <exact-plan.ai.md>", auto)
+        self.assertIn("/msf-auto resume <exact-plan.ai.md>", auto)
         self.assertIn("Mode: auto", checkpoint)
         self.assertIn("Worker identity", checkpoint)
         self.assertIn("Spawn result", checkpoint)
@@ -92,14 +92,11 @@ class PackageContractTests(unittest.TestCase):
     def test_auto_resolves_models_and_reports_typos_before_spawn(self) -> None:
         auto = self.read("skills/msf-auto/SKILL.md")
         checkpoint = self.read("skills/msf-auto/references/coordination-checkpoint.md")
-        self.assertIn("authoritative model inventory", auto)
-        self.assertIn("prefer `gpt-6-luna` only when", auto)
+        self.assertIn("exposes no model inventory", auto)
+        self.assertIn("omit the `model` parameter", auto)
         self.assertIn("Never silently correct", auto)
         self.assertIn("at most three closest available identifiers", auto)
         self.assertIn("STOP before spawn", auto)
-        self.assertIn("invalid_model", auto)
-        self.assertIn("model_not_found", auto)
-        self.assertIn("unsupported_model", auto)
         self.assertIn("renamed or removed between preflight and spawn", auto)
         self.assertIn("retry that exact model later", auto)
         self.assertIn("waiting_model_selection", checkpoint)

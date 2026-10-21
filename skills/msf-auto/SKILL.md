@@ -1,6 +1,7 @@
 ---
 name: msf-auto
-description: Plan, obtain approval, dispatch a fresh-model MSF Action worker, supervise execution, and verify completion in one explicitly invoked coordinator session.
+description: Plan, obtain approval, dispatch a fresh-context MSF Action worker, supervise execution, and verify completion in one explicitly invoked coordinator session.
+disable-model-invocation: true
 ---
 
 # MSF Auto
@@ -18,7 +19,7 @@ For a new workflow, require the user to supply Light, Medium, High, or Ultra. If
 
 For recovery, require `resume` plus one exact `.msf/plan/*.ai.md` path. Never select the newest plan, infer an active plan, or accept a directory.
 
-If the repository-local MSF baseline is missing, stop and instruct the user to explicitly invoke `$msf-init` before retrying Auto.
+If the repository-local MSF baseline is missing, stop and instruct the user to explicitly invoke `/msf-init` before retrying Auto.
 </HARD-GATE>
 
 ## Context boundary
@@ -50,46 +51,39 @@ After approval, finalize the plan pair and create one Auto checkpoint before dis
 
 ## Resolve the Action model
 
-Before dispatch, resolve the Action model against the current host's authoritative model inventory exposed by the native subagent tool or runtime catalog. Never treat model names in this skill, a README, memory, or an earlier checkpoint as proof that the model is still available.
+Claude Code exposes no model inventory, so resolve the Action model only from the values the `Agent` tool's `model` parameter currently accepts (aliases such as `sonnet`, `opus`, `haiku`, `fable`, as listed in that tool's schema in this session). Never treat model names in this skill, a README, memory, or an earlier checkpoint as proof that a model is available.
 
-- If the user did not name an Action model, prefer `gpt-6-luna` only when the current inventory contains that exact identifier. If the inventory proves it is absent or renamed, set the Auto checkpoint to `waiting_model_selection`, show the exact currently available model identifiers, ask the user which one to use, and STOP before spawn.
-- If the user named a model, require an exact current identifier after trimming surrounding whitespace. Never silently correct, alias, upgrade, downgrade, or substitute it.
-- When an exact match fails, report the requested spelling. If normalized comparison or conservative typo similarity finds plausible entries, show at most three closest available identifiers and ask the user to confirm one. Otherwise show the available identifiers and ask for an exact selection. STOP before spawn in either case.
-- If the host exposes no model inventory, state that preflight validation is unavailable. An exact user-supplied identifier or the default Luna preference may be attempted once; a model-resolution rejection must then follow the recovery rule below rather than being treated as a generic execution failure.
+- If the user did not name an Action model, omit the `model` parameter so the worker uses the host's default subagent model. Record that the model was defaulted.
+- If the user named a model, require an exact accepted value after trimming whitespace and lowercasing aliases. Never silently correct, alias, upgrade, downgrade, or substitute it.
+- When an exact match fails, report the requested spelling. If conservative typo similarity finds plausible entries, show at most three closest available identifiers and ask the user to confirm one. Otherwise show the accepted values and ask for an exact selection. Set the Auto checkpoint to `waiting_model_selection` and STOP before spawn in either case.
 
-Resolve reasoning effort from the selected model's current supported values. Use `high` by default for Luna when supported. For another model, preserve an explicit supported user choice; otherwise use that model's documented default. If an explicit effort is unsupported, report the supported values and ask the user to choose rather than silently changing it.
+Set `effort` only when the user explicitly asked for a level the tool accepts; otherwise omit it. If an explicit effort is not accepted, report the accepted values and ask the user to choose rather than silently changing it.
 
-Record the inventory source and observation time, originally requested model, resolved exact model, resolution status, suggestions, and reasoning effort in the Auto checkpoint. User confirmation applies only to that exact resolved identifier; refresh resolution before any later replacement worker.
+Record the accepted-value source and observation time, originally requested model, resolved model (or `default`), resolution status, suggestions, and effort in the Auto checkpoint. User confirmation applies only to that exact resolved value; refresh resolution before any later replacement worker.
 
 ## Dispatch the Action worker
 
-Use Codex's native subagent primitive. Spawn exactly one fresh worker with:
-
-- the exact model identifier resolved and, when necessary, confirmed above;
-- the supported reasoning effort resolved above;
-- no inherited turns or conversation context (`fork_turns=none` or the host equivalent);
-- a stable task name derived from the Plan ID;
-- the same checkout so the approved `.msf` artifacts and current worktree are visible.
-
-When the Codex collaboration tools are exposed, make the equivalent of this exact call rather than merely describing it:
+Invoking `/msf-auto` is the user's explicit request to use a subagent, and approval of the plan authorizes dispatch. Use Claude Code's `Agent` tool and spawn exactly one fresh worker:
 
 ```text
-spawn_agent(
-  task_name = "msf_action_<plan-id>",
-  fork_turns = "none",
-  model = <resolved exact model identifier>,
-  reasoning_effort = <resolved supported effort>,
-  message = <bounded Action dispatch>
+Agent(
+  subagent_type = "general-purpose",
+  description = "MSF Action <plan-id>",
+  model = <resolved model, omitted when defaulted>,
+  effort = <explicit supported effort, omitted otherwise>,
+  prompt = <bounded Action dispatch>
 )
 ```
 
-The worker prompt must include the repository root, exact `.ai.md` path, Plan ID, Auto checkpoint path, authorization boundaries, and these instructions: this fresh worker thread is the separate Action session required by `$msf-action`; explicitly invoke `$msf-action` for that exact plan; follow its preflight/devlog/checkpoint/verification protocol; report meaningful status or blockers to the coordinator.
+A new `Agent` call starts cold with no inherited conversation, which is the required context boundary; never use `subagent_type = "fork"`, which inherits the coordinator's context. Do not use worktree isolation: the worker must share the checkout so the approved `.msf` artifacts and current worktree are visible. The worker runs in the background and its completion arrives as a notification.
 
-An explicit spawn model overrides inherited/default subagent model settings. Record the returned worker identity and actual requested model in the Auto checkpoint. Do not silently substitute the coordinator model or claim a model was used if spawn did not confirm success.
+The worker prompt must include the repository root, exact `.ai.md` path, Plan ID, Auto checkpoint path, authorization boundaries, and these instructions: this fresh worker is the separate Action session required by `/msf-action`; because the skill is user-invocable only and cannot be loaded through the `Skill` tool, read `msf-action/SKILL.md` from the installed skills directory (`~/.claude/skills/` or the project's `.claude/skills/`) and follow it and its references for that exact plan; the worker cannot ask the user questions, so stop and end its turn with a report at any question, decision, plan deviation, repository conflict, verification failure, external blocker, or completion candidate.
 
-If spawn returns `invalid_model`, `model_not_found`, `unsupported_model`, or an equivalent model-resolution rejection, treat the earlier resolution as stale: refresh the authoritative inventory, record the exact error and new inventory, set Auto to `waiting_model_selection`, offer closest current identifiers when useful, ask the user for one exact model, and STOP. This handles a model renamed or removed between preflight and spawn.
+Record the returned agent ID and the model actually requested in the Auto checkpoint. Do not claim a model was used if spawn did not confirm success.
 
-If the exact model still exists but is temporarily unavailable, capacity-exhausted, or inaccessible to the signed-in account, distinguish that condition from a spelling error. Record the exact error and ask whether the user wants to retry that exact model later or select one of the currently accessible identifiers. For disabled subagents or other non-model prerequisites, set Auto to `blocked` and report the concrete prerequisite.
+If spawn is rejected for the `model` value (an invalid or unsupported model), treat the earlier resolution as stale: re-read the tool's accepted values, record the exact error, set Auto to `waiting_model_selection`, offer closest current values when useful, ask the user for one exact model, and STOP. This covers a model renamed or removed between preflight and spawn.
+
+If the exact model still exists but is temporarily unavailable, rate-limited, or inaccessible to the signed-in account, distinguish that from a spelling error. Record the exact error and ask whether the user wants to retry that exact model later or select another accepted value. For a missing `Agent` tool or other non-model prerequisites, set Auto to `blocked` and report the concrete prerequisite.
 
 Do not ask the user to copy a command, do not implement inside the coordinator, and do not silently retry with, downgrade to, or substitute any unconfirmed model.
 
@@ -97,16 +91,13 @@ Do not ask the user to copy a command, do not implement inside the coordinator, 
 
 Use the host's native agent controls:
 
-- use `wait_agent` for worker progress or completion with bounded event-driven waits;
-- use `send_message` while it is running to clarify or correct the current turn;
-- use `followup_task` when it is idle and additional approved work remains;
-- use `interrupt_agent` only to pause, abort, or prevent an imminent material deviation.
+- wait for the completion notification instead of polling a running worker;
+- use `SendMessage` to the worker's agent ID to continue it after it stops, whether to answer a question, correct the current work, or assign further approved work (load it with `ToolSearch` if it is deferred);
+- use `TaskStop` only to abort a worker that is about to cause a material deviation, then checkpoint before doing anything else.
 
-Ask the worker to report only meaningful events: task or verification checkpoint completed, question or required decision, plan deviation or repository conflict, verification failure or external blocker, and completion candidate.
+Each time the worker ends a turn, read its report, the Action checkpoint, and the development log before responding. Send the smallest useful correction. A correction may clarify or restore the approved contract, but must not expand it. If the needed change is material to scope, architecture, behavior, compatibility, security, or data handling, stop the worker, checkpoint the state, return to planning, and obtain new approval.
 
-At every event, read the Action checkpoint and development log before responding. Send the smallest useful correction. A correction may clarify or restore the approved contract, but must not expand it. If the needed change is material to scope, architecture, behavior, compatibility, security, or data handling, pause the worker, checkpoint the state, return to planning, and obtain new approval.
-
-Do not continuously poll a healthy worker, duplicate its edits, or treat silence as failure. Do not blindly restart after failure. A replacement worker is allowed only after reconciling the latest repository and checkpoint state; more than one replacement for the same unresolved condition requires user direction.
+Do not duplicate the worker's edits or treat silence as failure. Do not blindly restart after failure. A replacement worker is allowed only after reconciling the latest repository and checkpoint state; more than one replacement for the same unresolved condition requires user direction.
 
 ## Verify and close
 
@@ -116,4 +107,4 @@ Mark the Auto checkpoint `completed` only when the approved acceptance criteria 
 
 ## Resume
 
-For `$msf-auto resume <exact-plan.ai.md>`, load only Auto checkpoints matching both the exact plan path and Plan ID. Reconcile the checkpoint with the Action devlog/checkpoint, live worktree, and native subagent state before acting. Resume supervision when the recorded worker is live; otherwise refresh model resolution and spawn a fresh worker from the first incomplete dependency-ready task only after any required user confirmation. Never duplicate a live writer or trust recorded completion without fresh evidence.
+For `/msf-auto resume <exact-plan.ai.md>`, load only Auto checkpoints matching both the exact plan path and Plan ID. Reconcile the checkpoint with the Action devlog/checkpoint, live worktree, and `Agent` task state before acting. Resume supervision when the recorded worker is live; otherwise refresh model resolution and spawn a fresh worker from the first incomplete dependency-ready task only after any required user confirmation. Never duplicate a live writer or trust recorded completion without fresh evidence.

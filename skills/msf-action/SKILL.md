@@ -1,6 +1,7 @@
 ---
 name: msf-action
 description: Execute or resume one explicitly named, approved MSF agent plan using preflight review, automatic context checkpoints, evidence-based verification, and durable recovery records.
+disable-model-invocation: true
 ---
 
 # MSF Action

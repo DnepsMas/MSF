@@ -1,6 +1,7 @@
 ---
 name: msf-plan
 description: Run an explicit, strength-scaled MSF planning session that investigates the repository, resolves requirements, obtains approval, and persists a dated human/agent plan pair without implementing code.
+disable-model-invocation: true
 ---
 
 # MSF Plan
@@ -14,7 +15,7 @@ Reply to the user in Chinese by default. Switch only when explicitly requested. 
 <HARD-GATE>
 Before repository inspection, analysis, or file writes, check whether the user explicitly supplied Light, Medium, High, or Ultra in the current request.
 
-If absent, the first response MUST ask for the strength, briefly describe all four levels, and STOP. Never infer, recommend, or auto-select it. Prefer a native structured-choice tool exposed by the host, including Codex `request_user_input` or Claude Code's equivalent. Show all four options when supported. When limited to three plus `Other`, show Light, Medium, High and tell the user to enter Ultra via `Other`. Fall back to plain text when no such tool exists.
+If absent, the first response MUST ask for the strength, briefly describe all four levels, and STOP. Never infer, recommend, or auto-select it. Use the `AskUserQuestion` tool, offering all four options (Light, Medium, High, Ultra) in one question. Fall back to plain text only if the tool is unavailable.
 </HARD-GATE>
 
 ## Non-implementation boundary
@@ -23,7 +24,7 @@ If absent, the first response MUST ask for the strength, briefly describe all fo
 - Write only under `.msf/plan/` and `.msf/memory/`.
 - Do not modify code, tests, configuration, dependencies, external documentation, or Git state.
 - Do not scaffold, prototype, or begin implementation.
-- If the MSF baseline is missing, stop before planning writes and instruct the user to explicitly invoke `$msf-init`; resume Plan afterward.
+- If the MSF baseline is missing, stop before planning writes and instruct the user to explicitly invoke `/msf-init`; resume Plan afterward.
 
 ## Load context deliberately
 
@@ -37,7 +38,7 @@ Read [references/planning-levels.md](references/planning-levels.md) and apply th
 
 1. **Frame** — restate the problem, desired outcome, constraints, non-goals, and observable success.
 2. **Investigate** — trace the affected flow and find analogous working patterns. Label confirmed evidence, user decisions, and assumptions separately.
-3. **Clarify** — ask only consequential questions, one at a time. Prefer native choice UI when available. Do not ask the user to decide implementation details that repository evidence can settle.
+3. **Clarify** — ask only consequential questions, one at a time. Prefer `AskUserQuestion` when available. Do not ask the user to decide implementation details that repository evidence can settle.
 4. **Open the working report** — when requirement clarification is sufficient, create or update the dated human plan according to **Persist at planning checkpoints** below. Do not wait for the user to request a file.
 5. **Design** — present viable approaches when a meaningful tradeoff exists, leading with a recommendation. Keep YAGNI pressure: every component must serve an accepted requirement.
 6. **Decompose** — map requirements to coherent implementation tasks, dependencies, affected files or symbols, and task-level verification. Avoid both vague phases and mechanical micro-steps.
@@ -54,4 +55,4 @@ Write in batches when the current turn no longer needs another user requirement 
 
 If the session ends without approval, retain the human report with status `draft`, record unresolved items and the exact next step, and write a session summary. Do not create the `.ai.md` execution plan until approval.
 
-When approved, finish by reporting both exact plan paths and instructing the user to start a new session, explicitly invoke `$msf-action`, and name the `.ai.md` plan. When still draft or blocked, report the human-plan path, unresolved items, and exact next planning step. Never transition to implementation in this session.
+When approved, finish by reporting both exact plan paths and instructing the user to start a new session, explicitly invoke `/msf-action`, and name the `.ai.md` plan. When still draft or blocked, report the human-plan path, unresolved items, and exact next planning step. Never transition to implementation in this session.

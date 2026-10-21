@@ -1,6 +1,0 @@
-interface:
-  display_name: "MSF Init"
-  short_description: "Initialize persistent MSF project context"
-  default_prompt: "使用 $msf-init 在当前仓库初始化 MSF，并默认用中文回复。"
-policy:
-  allow_implicit_invocation: false

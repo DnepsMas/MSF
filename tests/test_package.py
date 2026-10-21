@@ -13,7 +13,7 @@ class PackageContractTests(unittest.TestCase):
         return (ROOT / relative).read_text(encoding="utf-8")
 
     def test_all_skills_are_explicit_only_and_default_to_chinese(self) -> None:
-        for name in ("msf-init", "msf-plan", "msf-action", "msf-auto"):
+        for name in ("msf-init", "msf-plan", "msf-action", "msf-review", "msf-auto"):
             with self.subTest(skill=name):
                 self.assertIn("disable-model-invocation: true", self.read(f"skills/{name}/SKILL.md").split("---")[1])
                 self.assertFalse((ROOT / "skills" / name / "agents").exists())
@@ -104,8 +104,27 @@ class PackageContractTests(unittest.TestCase):
         self.assertIn("Model resolved", checkpoint)
         self.assertIn("Suggested identifiers", checkpoint)
 
+    def test_review_is_independent_evidence_based_and_never_auto_fixes_critique(self) -> None:
+        review = self.read("skills/msf-review/SKILL.md")
+        layers = self.read("skills/msf-review/references/review-layers.md")
+        auto = self.read("skills/msf-auto/SKILL.md")
+        verification = self.read("skills/msf-action/references/verification.md")
+        self.assertIn("Never select the newest plan", review)
+        self.assertIn("did not write the code", review)
+        self.assertIn("Do not use computer-use", review)
+        self.assertIn("Write only the review report under `.msf/review/`", review)
+        for verdict in ("accepted", "needs_fixes", "blocked"):
+            self.assertIn(verdict, review)
+        self.assertIn("at most 10 findings", layers)
+        self.assertIn("Never turn a critique finding into an edit", layers)
+        self.assertIn("unverified", layers)
+        self.assertIn("msf-review/SKILL.md", auto)
+        self.assertIn("at most two fix-and-review rounds", auto)
+        self.assertIn("Layer 3 critique findings never trigger fixes", auto)
+        self.assertIn("Do not use computer-use", verification)
+
     def test_local_markdown_references_exist(self) -> None:
-        for name in ("msf-init", "msf-plan", "msf-action", "msf-auto"):
+        for name in ("msf-init", "msf-plan", "msf-action", "msf-review", "msf-auto"):
             folder = ROOT / "skills" / name
             text = (folder / "SKILL.md").read_text(encoding="utf-8")
             for reference in re.findall(r"\[[^]]+\]\(([^)]+)\)", text):

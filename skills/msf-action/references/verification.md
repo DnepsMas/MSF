@@ -15,6 +15,8 @@ Run what applies, in this order:
 
 For each command, record the exact command, exit status, meaningful result, and any skipped scope. Distinguish change-caused failures from confirmed pre-existing or environmental failures; neither may be silently ignored.
 
+Do not use computer-use or desktop control as verification. Prefer commands, tests, and file or output inspection; use a browser only when the acceptance criteria require observing a web UI.
+
 ## Completion decision
 
 Mark `completed` only when:

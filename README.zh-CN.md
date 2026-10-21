@@ -4,12 +4,15 @@
 
 MSF 是一套轻量、显式调用的 Claude Code 工作流，用于在多个独立任务之间保存项目规划，并按照已确认的计划进行可靠执行。
 
-它包含四个技能：
+它包含五个技能：
 
 - `/msf-init`：在项目内创建并说明 `.msf/` 工作区。
 - `/msf-plan`：调查项目、检查需求覆盖情况并生成可审批的计划，不修改业务文件。
 - `/msf-action`：在新的会话中审查并执行指定计划，自动把可恢复上下文 checkpoint 写入 `.msf`，记录进度并验证结果。
+- `/msf-review`：在全新会话中独立验收已完成的计划：核对验收标准、检查 diff 中的缺陷，High 和 Ultra 强度下还会做有上限的批判式评审。只在 `.msf/review/` 写带证据的报告，不修改项目。
 - `/msf-auto`：在一个主任务中完成规划、审批、派发全新上下文的 Action 子 Agent、监督纠偏和最终验收，但不让规划与执行 Agent 共用上下文或同时写代码。
+
+`/msf-auto` 在收尾时会派发全新上下文的 reviewer 并按其结论行动；批判类发现不会被自动修复，而是作为后续计划候选交给你。MSF 禁止把 computer-use / 桌面操控当作验收手段。
 
 这些技能不会自动触发，必须由用户明确调用。
 
@@ -21,7 +24,7 @@ MSF 是一套轻量、显式调用的 Claude Code 工作流，用于在多个独
 请帮我安装这个 GitHub 仓库里的 MSF 技能：
 https://github.com/DnepsMas/MSF
 
-请先检查 README、scripts/install.py 和四个 skills/*/SKILL.md，确认安装内容安全；然后克隆仓库并运行安装脚本，将 msf-init、msf-plan、msf-action、msf-auto 安装到当前用户的 Claude Code 技能目录（~/.claude/skills）。安装后验证四个技能都存在，并告诉我如何开始使用。如果已经安装旧版本，请使用 --force 更新。
+请先检查 README、scripts/install.py 和五个 skills/*/SKILL.md，确认安装内容安全；然后克隆仓库并运行安装脚本，将 msf-init、msf-plan、msf-action、msf-review、msf-auto 安装到当前用户的 Claude Code 技能目录（~/.claude/skills）。安装后验证四个技能都存在，并告诉我如何开始使用。如果已经安装旧版本，请使用 --force 更新。
 ```
 
 Claude Code 可能会请求网络访问、写入用户技能目录或运行安装脚本的权限。确认目标确实是本仓库和你的个人技能目录后，再批准这些请求。

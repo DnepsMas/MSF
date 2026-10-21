@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILLS = ("msf-init", "msf-plan", "msf-action", "msf-auto")
+SKILLS = ("msf-init", "msf-plan", "msf-action", "msf-review", "msf-auto")
 
 
 def require(condition: bool, message: str) -> None:
@@ -44,6 +44,7 @@ def main() -> int:
     init_sections = sections(contents["msf-init"])
     plan_sections = sections(contents["msf-plan"])
     action_sections = sections(contents["msf-action"])
+    review_sections = sections(contents["msf-review"])
     auto_sections = sections(contents["msf-auto"])
     require({"scope", "establish project context", "version-control invariant", "verify and report"} <= init_sections, "msf-init: incomplete lifecycle")
     require("<HARD-GATE>" in contents["msf-plan"], "msf-plan: strength gate missing")
@@ -57,6 +58,9 @@ def main() -> int:
     require("Never select the newest plan" in contents["msf-action"], "msf-action: explicit plan selection missing")
     require("before the first production mutation" in contents["msf-action"], "msf-action: pre-mutation checkpoint missing")
     require("The `.msf` records, not chat history" in contents["msf-action"], "msf-action: context handoff contract missing")
+    require("<HARD-GATE>" in contents["msf-review"], "msf-review: entry gate missing")
+    require({"boundary", "load narrowly", "choose the layers", "run the review", "report"} <= review_sections, "msf-review: incomplete lifecycle")
+    require("Do not use computer-use" in contents["msf-review"], "msf-review: computer-use ban missing")
     require("<HARD-GATE>" in contents["msf-auto"], "msf-auto: entry gate missing")
     require({"context boundary", "plan", "open the coordination checkpoint", "resolve the action model", "dispatch the action worker", "supervise without micromanaging", "verify and close", "resume"} <= auto_sections, "msf-auto: incomplete lifecycle")
     require("never use `subagent_type = \"fork\"`" in contents["msf-auto"], "msf-auto: fresh worker boundary missing")

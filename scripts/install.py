@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 
 
-SKILLS = ("msf-init", "msf-plan", "msf-action", "msf-auto")
+SKILLS = ("msf-init", "msf-plan", "msf-action", "msf-review", "msf-auto")
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = PROJECT_ROOT / "skills"
 

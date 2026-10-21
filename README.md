@@ -9,7 +9,10 @@ MSF is a lightweight, explicit Claude Code workflow for persistent project plann
 - `/msf-init` creates and summarizes the repository-local `.msf/` workspace.
 - `/msf-plan` scales planning depth, investigates the repository, checks requirement/task coverage, and produces a dated approved human/agent plan pair without editing business files.
 - `/msf-action` critically reviews and executes a user-specified plan in a new session, automatically checkpoints recoverable context under `.msf`, diagnoses failures from evidence, and verifies acceptance before completion.
+- `/msf-review` independently reviews a finished plan in a fresh session: conformance to acceptance criteria, defects in the diff, and, at High and Ultra, a bounded critique. It writes an evidence-backed report under `.msf/review/` and never edits the project.
 - `/msf-auto` plans in the parent session, obtains approval, dispatches a fresh-context Action subagent, supervises corrections, and independently verifies completion without merging the two agent contexts.
+
+`/msf-auto` finishes by dispatching a fresh reviewer and acts on its verdict. Critique findings are never fixed automatically; they become follow-up plan candidates. MSF forbids computer-use or desktop control as verification.
 
 The skills never activate implicitly. `.msf/` belongs in the project repository; the skills themselves are installed in the user's Claude Code skills directory.
 

@@ -42,6 +42,13 @@ Append `-02`, `-03`, and so on on collision. Update the same file throughout the
 - Development log: <exact path, pending, or none>
 - Last meaningful event: <timestamp and concise event>
 
+## Review
+- Reviewer identity: <Agent tool agent ID, or none>
+- Review report: <exact path, pending, or none>
+- Verdict: accepted | needs_fixes | blocked | pending
+- Fix rounds used: <0, 1, or 2>
+- Follow-up candidates: <count and report path, or none>
+
 ## Supervision
 - Corrections sent: <concise approved-contract clarifications, or none>
 - Reconcile before next action: <live state that must be checked>

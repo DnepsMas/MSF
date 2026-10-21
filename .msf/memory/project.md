@@ -2,12 +2,12 @@
 
 ## Project overview
 
-MSF (My Skill Folder) is a lightweight, explicit Claude Code workflow (the `claude` branch; `main` targets Codex) for persistent project planning and execution. It packages four explicitly invoked skills: `msf-init`, `msf-plan`, `msf-action`, and `msf-auto`.
+MSF (My Skill Folder) is a lightweight, explicit Claude Code workflow (the `claude` branch; `main` targets Codex) for persistent project planning and execution. It packages five explicitly invoked skills: `msf-init`, `msf-plan`, `msf-action`, `msf-review`, and `msf-auto`.
 
 ## Technology and structure
 
 - Python 3 is required for installation and validation tooling.
-- `skills/` contains the four Claude Code skill packages and their instructions, references, and assets.
+- `skills/` contains the five Claude Code skill packages and their instructions, references, and assets.
 - `scripts/install.py` installs the skills into `~/.claude/skills`.
 - `scripts/validate.py` validates package structure and workflow invariants.
 - `tests/test_install.py` contains unit tests for fresh, guarded, forced, and dry-run installation behavior.

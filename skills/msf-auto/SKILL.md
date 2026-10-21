@@ -101,9 +101,19 @@ Do not duplicate the worker's edits or treat silence as failure. Do not blindly 
 
 ## Verify and close
 
-The worker may report a completion candidate; the coordinator owns final acceptance. Independently inspect the final diff, Action devlog, Action checkpoint, fresh verification evidence, plan coverage, deviations, and unexplained worktree changes. Send compatible fixes back to the same worker when possible.
+The worker may report a completion candidate; the coordinator owns final acceptance. First inspect the final diff, Action devlog, Action checkpoint, fresh verification evidence, plan coverage, deviations, and unexplained worktree changes.
 
-Mark the Auto checkpoint `completed` only when the approved acceptance criteria are satisfied. Otherwise close it as `partial` or `blocked` with the exact next action. Report the plan pair, worker model and identity, Action records, verification evidence, deviations, risks, and final Auto checkpoint path.
+Then obtain an independent review. Spawn one fresh reviewer with the `Agent` tool (`subagent_type = "general-purpose"`, never `"fork"`, same model resolution as the worker unless the user chose otherwise) whose prompt gives the repository root, exact `.ai.md` path, Plan ID, strength, and these instructions: read `msf-review/SKILL.md` from the installed skills directory and follow it for that exact plan; do not edit anything except the report under `.msf/review/`; do not use computer-use; end with the report path and verdict. The reviewer shares nothing with the worker or the coordinator beyond the `.msf` artifacts and the checkout.
+
+Act on the verdict:
+
+- `accepted`: continue to closure.
+- `needs_fixes`: send only the Layer 1 and 2 blocker and major findings back to the same worker with `SendMessage`, then request a fresh review. Allow at most two fix-and-review rounds; afterwards close as `partial` with the remaining findings.
+- `blocked`: set Auto to `blocked` and report what prevented judgment.
+
+Layer 3 critique findings never trigger fixes. Report them as follow-up plan candidates for the user to take to `/msf-plan`.
+
+Mark the Auto checkpoint `completed` only when the approved acceptance criteria are satisfied and the latest review verdict is `accepted`. Otherwise close it as `partial` or `blocked` with the exact next action. Report the plan pair, worker model and identity, Action records, review report path and verdict, verification evidence, deviations, risks, and final Auto checkpoint path.
 
 ## Resume
 

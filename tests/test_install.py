@@ -39,7 +39,7 @@ class InstallTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             destination = Path(temp) / "skills"
             targets = install(destination, dry_run=True)
-            self.assertEqual(4, len(targets))
+            self.assertEqual(len(SKILLS), len(targets))
             self.assertFalse(destination.exists())
 
 
